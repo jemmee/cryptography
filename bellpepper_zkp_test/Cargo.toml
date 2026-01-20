@@ -1,0 +1,10 @@
+[package]
+name = "bellpepper_zkp_test"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bellman = { version = "0.14.0", features = ["groth16"] }
+blstrs = "0.7.0"
+ff = "0.13.0"
+rand = "0.8"
