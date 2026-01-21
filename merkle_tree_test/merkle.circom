@@ -1,7 +1,6 @@
 // npm install circomlib
-//
+// 
 // circom merkle.circom --r1cs --wasm --sym
-
 
 pragma circom 2.1.0;
 
