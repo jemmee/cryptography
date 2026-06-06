@@ -8,10 +8,10 @@ bouncycastle = { git = "https://github.com/bcgit/bc-rust.git", package = "bouncy
 
 # Individual algorithm crates (with the correct naming)
 bouncycastle-core = { git = "https://github.com/bcgit/bc-rust.git", package = "bouncycastle-core" }
+bouncycastle-hex = { git = "https://github.com/bcgit/bc-rust.git", package = "bouncycastle-hex" }
+bouncycastle-base64 = { git = "https://github.com/bcgit/bc-rust.git", package = "bouncycastle-base64" }
 bouncycastle-sha2 = { git = "https://github.com/bcgit/bc-rust.git", package = "bouncycastle-sha2" }
 bouncycastle-sha3 = { git = "https://github.com/bcgit/bc-rust.git", package = "bouncycastle-sha3" }
 bouncycastle-rng = { git = "https://github.com/bcgit/bc-rust.git", package = "bouncycastle-rng" }
 bouncycastle-hmac = { git = "https://github.com/bcgit/bc-rust.git", package = "bouncycastle-hmac" }
 bouncycastle-hkdf = { git = "https://github.com/bcgit/bc-rust.git", package = "bouncycastle-hkdf" }
-
-hex = "0.4"
