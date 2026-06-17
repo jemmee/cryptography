@@ -28,11 +28,29 @@ fn main() {
     let output = base64::encode(data);
     println!("Data in base64: {}", output);
 
+    let output: Vec<u8> = sha2::SHA224::new().hash(data);
+    println!("SHA224 of data in hex: {}", hex::encode(output));
+
     let output: Vec<u8> = sha2::SHA256::new().hash(data);
     println!("SHA256 of data in hex: {}", hex::encode(output));
 
+    let output: Vec<u8> = sha2::SHA384::new().hash(data);
+    println!("SHA384 of data in hex: {}", hex::encode(output));
+
+    let output: Vec<u8> = sha2::SHA512::new().hash(data);
+    println!("SHA512 of data in hex: {}", hex::encode(output));
+
+    let output: Vec<u8> = sha3::SHA3_224::new().hash(data);
+    println!("SHA3_224 of data in hex: {}", hex::encode(output));
+    
     let output: Vec<u8> = sha3::SHA3_256::new().hash(data);
     println!("SHA3_256 of data in hex: {}", hex::encode(output));
+
+    let output: Vec<u8> = sha3::SHA3_384::new().hash(data);
+    println!("SHA3_384 of data in hex: {}", hex::encode(output));
+
+    let output: Vec<u8> = sha3::SHA3_512::new().hash(data);
+    println!("SHA3_512 of data in hex: {}", hex::encode(output));
 
     let random_bytes: [u8; 16] = rng::DefaultRNG::default().next_bytes(16).unwrap().try_into().expect("RNG returned wrong number of bytes");
     // println!("Random bytes: {:?}", random_bytes);
