@@ -5,48 +5,88 @@ package main
 import (
 	"crypto/subtle"
 	"fmt"
+	"strings"
+	"time"
 )
 
-// In a real application, this would be a hashed value or a secure API key.
-const correctToken = "Then were the king's scribes called at that time in the third month, that is, the month Sivan, on the three and twentieth day thereof; and it was written according to all that Mordecai commanded unto the Jews, and to the lieutenants, and the deputies and rulers of the provinces which are from India unto Ethiopia, an hundred twenty and seven provinces, unto every province according to the writing thereof, and unto every people after their language, and to the Jews according to their writing, and according to their language"
-
 func main() {
-	// Simulated user inputs
-	wrongTokenEarly := "Xhen were the king's scribes called at that time in the third month, that is, the month Sivan, on the three and twentieth day thereof; and it was written according to all that Mordecai commanded unto the Jews, and to the lieutenants, and the deputies and rulers of the provinces which are from India unto Ethiopia, an hundred twenty and seven provinces, unto every province according to the writing thereof, and unto every people after their language, and to the Jews according to their writing, and according to their language" // Fails on the 1st character
-	wrongTokenLate := "Then were the king's scribes called at that time in the third month, that is, the month Sivan, on the three and twentieth day thereof; and it was written according to all that Mordecai commanded unto the Jews, and to the lieutenants, and the deputies and rulers of the provinces which are from India unto Ethiopia, an hundred twenty and seven provinces, unto every province according to the writing thereof, and unto every people after their language, and to the Jews according to their writing, and according to their languagX"  // Fails on the last character
-	goodToken := "Then were the king's scribes called at that time in the third month, that is, the month Sivan, on the three and twentieth day thereof; and it was written according to all that Mordecai commanded unto the Jews, and to the lieutenants, and the deputies and rulers of the provinces which are from India unto Ethiopia, an hundred twenty and seven provinces, unto every province according to the writing thereof, and unto every people after their language, and to the Jews according to their writing, and according to their language"       // Perfect match
+	// 1. Create a very long base string
+	// This amplifies the timing difference between an early fail and a late fail.
+	baseString := strings.Repeat("Then were the king's scribes called at that time in the third month, that is, the month Sivan, on the three and twentieth day thereof; and it was written according to all that Mordecai commanded unto the Jews, and to the lieutenants, and the deputies and rulers of the provinces which are from India unto Ethiopia, an hundred twenty and seven provinces, unto every province according to the writing thereof, and unto every people after their language, and to the Jews according to their writing, and according to their language", 2000)
 
-	fmt.Println("--- Standard Comparison (Vulnerable to Timing Attacks) ---")
-	fmt.Printf("Early fail match: %v\n", vulnerableCompare(wrongTokenEarly, correctToken))
-	fmt.Printf("Late fail match:  %v\n", vulnerableCompare(wrongTokenLate, correctToken))
+	correctToken := baseString + "MATCH"
+	wrongTokenEarly := "X" + baseString + "MATCH" // Fails on the very 1st character
+	wrongTokenLate := baseString + "MATCX"        // Fails on the very last character
 
-	fmt.Println("\n--- Constant-Time Comparison (Secure) ---")
-	fmt.Printf("Early fail match: %v\n", secureCompare(wrongTokenEarly, correctToken))
-	fmt.Printf("Late fail match:  %v\n", secureCompare(wrongTokenLate, correctToken))
-	fmt.Printf("Exact match:      %v\n", secureCompare(goodToken, correctToken))
+	// Number of iterations to make the time difference measurable
+	// iterations := 5_000_000
+	iterations := 10000
+
+	fmt.Printf("Running each test %d times...\n\n", iterations)
+
+	// ==========================================
+	// Test 1: Standard Comparison (Vulnerable)
+	// ==========================================
+	fmt.Println("--- Standard Comparison (Vulnerable) ---")
+
+	start := time.Now()
+	for i := 0; i < iterations; i++ {
+		_ = vulnerableCompare(wrongTokenEarly, correctToken)
+	}
+	earlyFailDuration := time.Since(start)
+	fmt.Printf("Early Fail Time: %v\n", earlyFailDuration)
+
+	start = time.Now()
+	for i := 0; i < iterations; i++ {
+		_ = vulnerableCompare(wrongTokenLate, correctToken)
+	}
+	lateFailDuration := time.Since(start)
+	fmt.Printf("Late Fail Time:  %v\n", lateFailDuration)
+
+	// Calculate the difference
+	vulnDiff := lateFailDuration - earlyFailDuration
+	fmt.Printf("↳ Time difference leaked: %v\n\n", vulnDiff)
+
+	// ==========================================
+	// Test 2: Constant-Time Comparison (Secure)
+	// ==========================================
+	fmt.Println("--- Constant-Time Comparison (Secure) ---")
+
+	start = time.Now()
+	for i := 0; i < iterations; i++ {
+		_ = secureCompare(wrongTokenEarly, correctToken)
+	}
+	secureEarlyDuration := time.Since(start)
+	fmt.Printf("Early Fail Time: %v\n", secureEarlyDuration)
+
+	start = time.Now()
+	for i := 0; i < iterations; i++ {
+		_ = secureCompare(wrongTokenLate, correctToken)
+	}
+	secureLateDuration := time.Since(start)
+	fmt.Printf("Late Fail Time:  %v\n", secureLateDuration)
+
+	// Calculate the difference
+	secureDiff := secureLateDuration - secureEarlyDuration
+	if secureDiff < 0 {
+		secureDiff = -secureDiff
+	}
+	fmt.Printf("↳ Time difference leaked: %v\n", secureDiff)
 }
 
-// vulnerableCompare uses standard equality.
-// It returns faster if the first character is wrong than if the last character is wrong.
 func vulnerableCompare(input, target string) bool {
 	return input == target
 }
 
-// secureCompare uses crypto/subtle to ensure the comparison time is uniform.
 func secureCompare(input, target string) bool {
 	inputBytes := []byte(input)
 	targetBytes := []byte(target)
 
-	// ConstantTimeCompare requires slices of equal length.
-	// If lengths differ, we must still perform a constant-time operation
-	// to avoid leaking the correct string's length.
 	if len(inputBytes) != len(targetBytes) {
-		// Compare target with itself to consume time, but ultimately return false
 		subtle.ConstantTimeCompare(targetBytes, targetBytes)
 		return false
 	}
 
-	// Returns 1 if equal, 0 if not.
 	match := subtle.ConstantTimeCompare(inputBytes, targetBytes)
 	return match == 1
 }
