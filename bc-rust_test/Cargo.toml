@@ -15,3 +15,5 @@ bouncycastle-sha3 = { git = "https://github.com/bcgit/bc-rust.git", package = "b
 bouncycastle-rng = { git = "https://github.com/bcgit/bc-rust.git", package = "bouncycastle-rng" }
 bouncycastle-hmac = { git = "https://github.com/bcgit/bc-rust.git", package = "bouncycastle-hmac" }
 bouncycastle-hkdf = { git = "https://github.com/bcgit/bc-rust.git", package = "bouncycastle-hkdf" }
+bouncycastle-mlkem = { git = "https://github.com/bcgit/bc-rust.git", package = "bouncycastle-mlkem" }
+bouncycastle-mldsa = { git = "https://github.com/bcgit/bc-rust.git", package = "bouncycastle-mldsa" }
