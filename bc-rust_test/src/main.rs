@@ -6,15 +6,16 @@
 // cargo run
 
 use bouncycastle_hex as hex;
+use bouncycastle_base64 as base64;
 use bouncycastle_core::traits::Hash;
 use bouncycastle_sha2 as sha2;
 use bouncycastle_sha3 as sha3;
+use bouncycastle_core::traits::XOF;
 use bouncycastle_core::traits::RNG;
 use bouncycastle_rng as rng;
 use bouncycastle_hmac::{HMAC_SHA224, HMAC_SHA256, HMAC_SHA384, HMAC_SHA512, HMAC_SHA3_224, HMAC_SHA3_256, HMAC_SHA3_384, HMAC_SHA3_512};
 use bouncycastle_core::traits::MAC;
 use bouncycastle_core::key_material::{KeyMaterial256, KeyMaterial512, KeyType};
-use bouncycastle_base64 as base64;
 use bouncycastle_core::traits::KDF;
 use bouncycastle_hkdf::HKDF_SHA256;
 use bouncycastle_mlkem::{MLKEM512, MLKEM768, MLKEM1024,MLKEMTrait};
@@ -57,6 +58,16 @@ fn main() {
 
     let output: Vec<u8> = sha3::SHA3_512::new().hash(data);
     println!("SHA3_512 of data in hex: {}", hex::encode(output));
+
+    let mut shake = sha3::SHAKE128::new();
+    shake.absorb(data);
+    let output: Vec<u8> = shake.squeeze(16);
+    println!("SHAKE128 of data in hex: {}", hex::encode(output));
+
+    let mut shake = sha3::SHAKE256::new();
+    shake.absorb(data);
+    let output: Vec<u8> = shake.squeeze(16);
+    println!("SHAKE256 of data in hex: {}", hex::encode(output));
 
     // let random_bytes: [u8; 16] = rng::DefaultRNG::default().next_bytes(16).unwrap().try_into().expect("RNG returned wrong number of bytes");
     let random_bytes: [u8; 32] = rng::DefaultRNG::default().next_bytes(32).unwrap().try_into().expect("RNG returned wrong number of bytes");
