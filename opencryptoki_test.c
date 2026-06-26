@@ -15,10 +15,8 @@
 // pkcsconf -s
 // pkcsconf -c 3 -u
 //
-// curl -O pkcs11.h
-// https://raw.githubusercontent.com/OpenSC/OpenSC/master/src/pkcs11/pkcs11.h
-// curl -O pd-pkcs11.h
-// https://raw.githubusercontent.com/OpenSC/OpenSC/master/src/pkcs11/pd-pkcs11.h
+// curl -O pkcs11.h https://raw.githubusercontent.com/OpenSC/OpenSC/master/src/pkcs11/pkcs11.h
+// curl -O pd-pkcs11.h // https://raw.githubusercontent.com/OpenSC/OpenSC/master/src/pkcs11/pd-pkcs11.h
 //
 // gcc opencryptoki_test.c -o opencryptoki_test -ldl
 //
